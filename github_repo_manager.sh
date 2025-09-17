@@ -2,6 +2,11 @@
 
 # GitHub Repository Manager
 # This script allows you to list and delete repositories from your GitHub account
+#
+# Created by: Shabaj Ansari
+# GitHub: https://github.com/SHabaj-dev
+# Version: 1.0.0
+# Description: Interactive tool for managing GitHub repositories with safety features
 
 # Colors for output
 RED='\033[0;31m'
@@ -23,6 +28,21 @@ print_color() {
     local color=$1
     local message=$2
     echo -e "${color}${message}${NC}"
+}
+
+# Function to display creator information
+show_creator_info() {
+    print_color $BLUE "╔══════════════════════════════════════════════════════════════╗"
+    print_color $BLUE "║                    GitHub Repository Manager                ║"
+    print_color $BLUE "╠══════════════════════════════════════════════════════════════╣"
+    print_color $GREEN "║  Created by: Shabaj Ansari                                ║"
+    print_color $GREEN "║  GitHub: https://github.com/SHabaj-dev                  ║"
+    print_color $GREEN "║  Version: 1.0.0                                           ║"
+    print_color $BLUE "║                                                              ║"
+    print_color $YELLOW "║  Description: Interactive tool for managing GitHub repos   ║"
+    print_color $YELLOW "║  Features: List, select, and delete repositories safely   ║"
+    print_color $BLUE "╚══════════════════════════════════════════════════════════════╝"
+    echo
 }
 
 # Function to check if required tools are installed
@@ -98,7 +118,30 @@ test_github_connection() {
     
     if [ "$http_code" -eq 200 ]; then
         local username=$(echo "$body" | jq -r '.login')
-        print_color $GREEN "✓ Connected to GitHub as: $username"
+        local name=$(echo "$body" | jq -r '.name // "Not set"')
+        local email=$(echo "$body" | jq -r '.email // "Not set"')
+        local public_repos=$(echo "$body" | jq -r '.public_repos')
+        local followers=$(echo "$body" | jq -r '.followers')
+        local following=$(echo "$body" | jq -r '.following')
+        
+        print_color $GREEN "✓ Connected to GitHub successfully!"
+        print_color $BLUE "╔══════════════════════════════════════════════════════════════╗"
+        print_color $BLUE "║                    GitHub Account Info                      ║"
+        print_color $BLUE "╠══════════════════════════════════════════════════════════════╣"
+        print_color $GREEN "║  Username: $username"
+        printf "%*s║\n" $((58 - ${#username})) ""
+        print_color $GREEN "║  Name: $name"
+        printf "%*s║\n" $((58 - ${#name})) ""
+        print_color $GREEN "║  Email: $email"
+        printf "%*s║\n" $((58 - ${#email})) ""
+        print_color $GREEN "║  Public Repositories: $public_repos"
+        printf "%*s║\n" $((58 - ${#public_repos})) ""
+        print_color $GREEN "║  Followers: $followers"
+        printf "%*s║\n" $((58 - ${#followers})) ""
+        print_color $GREEN "║  Following: $following"
+        printf "%*s║\n" $((58 - ${#following})) ""
+        print_color $BLUE "╚══════════════════════════════════════════════════════════════╝"
+        echo
         GITHUB_USERNAME="$username"
     else
         print_color $RED "✗ Failed to connect to GitHub API (HTTP $http_code)"
@@ -286,8 +329,8 @@ show_menu() {
 
 # Main function
 main() {
-    print_color $GREEN "GitHub Repository Manager"
-    print_color $YELLOW "This script will help you manage your GitHub repositories"
+    # Show creator information
+    show_creator_info
     
     # Check dependencies
     check_dependencies
